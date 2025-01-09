@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบเช่าหนังสือออนไลน์</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Prompt', sans-serif;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --accent-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --background-color: #f8fafc;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+            --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        /* Navigation Styles */
+        .navbar {
+            background-color: white;
+            box-shadow: var(--card-shadow);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--text-color);
+        }
+
+        .logo i {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        /* User Menu Styles */
+        .user-menu {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: var(--card-shadow);
+            min-width: 200px;
+            padding: 0.5rem;
+            display: none;
+            z-index: 1000;
+        }
+
+        .user-dropdown.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .user-dropdown a {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .user-dropdown a:hover {
+            background-color: var(--background-color);
+            border-radius: 0.25rem;
+        }
+
+        /* Search Bar Styles */
+        .search-container {
+            margin-top: 80px;
+            padding: 2rem;
+            background: white;
+            box-shadow: var(--card-shadow);
+        }
+
+        .search-bar {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .search-input-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Filter Styles */
+        .filters {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-button {
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: 2rem;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+
+        .filter-button:hover,
+        .filter-button.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Main Content Container */
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            margin-top: -20px;
+        }
+
+        /* Grid Layout */
+        .book-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        /* Book Card Styles */
+        .book-card {
+            background: white;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            
+            width: 240px;
+            margin: auto;
+        }
+
+        .book-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .book-image-container {
+    position: relative;
+    padding-top: 100%;
+    overflow: hidden;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.book-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    object-fit: cover;
+    transition: transform 0.2s ease;
+}
+
+
+        .book-card:hover .book-image {
+            transform: scale(1.05);
+        }
+
+        .book-info {
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .book-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .book-metadata {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .badge {
+            background-color: #f1f5f9;
+            color: var(--primary-color);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .rent-section {
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .rent-section input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+        }
+
+        .rent-section button {
+            padding: 0.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .rent-section button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .rating {
+            display: flex;
+            justify-content: center;
+            gap: 0.2rem;
+            margin-top: 0.5rem;
+        }
+
+        .rating i {
+            color: var(--warning-color);
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .rating i:hover,
+        .rating i.active {
+            color: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="#" class="logo">
+                <i class="fas fa-book"></i>
+                <h1>ระบบเช่าหนังสือออนไลน์</h1>
+            </a>
+            <div class="nav-links">
+                <a href="#home">หน้าแรก</a>
+                <a href="#categories">หมวดหมู่</a>
+                <a href="#promotion">โปรโมชั่น</a>
+                <a href="#history">ประวัติการเช่า</a>
+                <div class="user-menu">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-dropdown">
+                        <a href="#profile"><i class="fas fa-user-circle"></i> โปรไฟล์</a>
+                        <a href="#settings"><i class="fas fa-cog"></i> ตั้งค่า</a>
+                        <a href="#logout"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    
+
+    
+
+    <!-- Search Section -->
+    <div class="search-container">
+        <div class="search-bar">
+            <div class="search-input-group">
+                <input type="text" class="search-input" placeholder="ค้นหาหนังสือ..." id="searchInput">
+            </div>
+            <div class="filters">
+                <button class="filter-button active">ทั้งหมด</button>
+                <button class="filter-button">นิยาย</button>
+                <button class="filter-button">การ์ตูน</button>
+                <button class="filter-button">นิยายแปล</button>
+                <button class="filter-button">หนังสือเรียน</button>
+                <button class="filter-button">วรรณกรรม</button>
+                <button class="filter-button">ความรู้ทั่วไป</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="book-grid" id="bookGrid">
+            <!-- Book cards will be inserted here by JavaScript -->
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="book-grid">
+            <div class="book-card">
+                <div class="book-image-container">
+                    <img src="" alt="Book 1" class="">
+                </div>
+                <div class="book-info">
+                    <h3 class="book-title">หนังสือเล่มที่ 1</h3>
+                    <div class="book-metadata">
+                        <span class="badge">นิยาย</span>
+                        <div class="book-rating">
+                            <span class="rating" data-book-id="1">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </span>
+                            <span id="rating-1">0</span>
+                        </div>
+                    </div>
+                    <div class="rent-section">
+                        <label>จำนวนวันที่ต้องการเช่า:</label>
+                        <input type="number" id="rentDays-1" placeholder="ใส่จำนวนวัน" min="1">
+                        <button onclick="rentBook(1)">เช่าหนังสือ</button>
+                        <p id="lateFee-1" style="color: var(--danger-color); display: none;">มีค่าปรับ 0 บาท</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const rentalRates = 10; // ค่าเช่าต่อวัน
+        const lateFeeRate = 5; // ค่าปรับต่อวัน
+
+        function rentBook(bookId) {
+            const rentDays = document.getElementById(`rentDays-${bookId}`).value;
+            const lateFeeEl = document.getElementById(`lateFee-${bookId}`);
+            const returnDate = new Date();
+            returnDate.setDate(returnDate.getDate() + parseInt(rentDays));
+
+            alert(`คุณได้เช่าหนังสือเล่มนี้เป็นเวลา ${rentDays} วัน\nกรุณาคืนภายในวันที่: ${returnDate.toLocaleDateString()}`);
+
+            // สมมติว่ามีการคืนหนังสือเกินกำหนด 3 วัน
+            const overdueDays = 3;
+            if (overdueDays > 0) {
+                const lateFee = overdueDays * lateFeeRate;
+                lateFeeEl.style.display = 'block';
+                lateFeeEl.textContent = `มีค่าปรับ ${lateFee} บาท`;
+            }
+        }
+
+        document.querySelectorAll('.rating i').forEach(star => {
+            star.addEventListener('click', function () {
+                const rating = this.parentElement;
+                const stars = rating.querySelectorAll('i');
+                const bookId = rating.dataset.bookId;
+                let starIndex = Array.from(stars).indexOf(this);
+
+                stars.forEach((s, index) => {
+                    s.classList.toggle('active', index <= starIndex);
+                });
+
+                document.getElementById(`rating-${bookId}`).textContent = starIndex + 1;
+            });
+        });
+    </script>
+
+    <!-- To be continued in Part 2... -->
+</body>
+</html>
